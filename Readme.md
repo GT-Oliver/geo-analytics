@@ -20,6 +20,7 @@ vtag-geo-analytics/          ← 发布出去的就是这个目录,单独一层�
     metrics.md               六指标公式 + 口径红线全文 + 来源分档的原值含义
 tools/gen_endpoints.py       生成器:读后端 reports.py,写 references/endpoints.md
                              与 SKILL.md 里那张摘要表(留在包外,包是公开可读的)
+tools/pack.sh                打 dist/*.zip:SKILL.md 落在 zip 根目录,打完自校验
 ```
 
 ## 端点表由生成器产出,不许手抄
@@ -62,15 +63,50 @@ python3 tools/gen_endpoints.py --check    # 只校验同步,不写;适合发版�
 5. **端到端对数** —— 同一个问题经 skill 查一遍、在控制台看一遍,**数必须一模一样**;
    并抽查有没有编因果、有没有在没数据时给数。
 
-## 发布(跑通后回填为实测)
+## 打包上传:SKILL.md 必须在根目录
 
-| 市场 | 发布方式 | 状态 |
-|---|---|---|
-| clawhub.ai | `npm i -g clawhub` → `clawhub login` → `clawhub skill publish ./vtag-geo-analytics --slug <slug> --version <ver>`;也支持从 GitHub 导入 | **未实测**(读官网,不是跑过) |
-| skillhub.cn | 首页未给出投稿规范 | **未实测** |
+```bash
+tools/pack.sh        # → dist/vtag-geo-analytics-<version>.zip,打完自校验
+```
+
+skillhub.cn 的发布检查清单写的是「ZIP 包或 Skill 文件夹内必须包含 `SKILL.md`」,
+步骤里更严格:「确认**根目录**包含 SKILL.md」。**在仓库根 `zip -r` 会打出
+`vtag-geo-analytics/SKILL.md`——根目录没有它,当场判缺文件。**
+`pack.sh` 是 cd 进包目录再打的,并在打完后回头验三件事:根目录有 SKILL.md、
+体积 ≤ 10 MB、文件数 ≤ 200。选「上传文件夹」时同理:选的是 `vtag-geo-analytics/`,
+不是仓库根。
+
+## 发布
+
+### skillhub.cn(读了官方教程,**未跑过发布流程**)
+
+来源:`https://skillhub.cn/tutorials`(页面是 SPA,内容在 JS bundle 里,网页抓取抓不到)。
+
+| 要求 | 我们的状态 |
+|---|---|
+| ZIP / 文件夹**根目录**含 `SKILL.md` | ✅ 用 `tools/pack.sh` |
+| 单次上传 ≤ 10.00 MB,建议 ≤ 200 个文件 | ✅ 6 个文件 / 约 13 KB |
+| Slug:仅小写字母、数字、连字符,**提交后不可改** | ✅ `vtag-geo-analytics` |
+| 版本号 + 变更说明 | ✅ frontmatter `version: 0.1.0`(发布时另填变更说明) |
+| 描述说清输入、输出、适用边界 | ✅ 正文有端点表、口径红线、未授权时的降级 |
+| 计费策略 | **免费模式**——「免费模式无需商户入驻」,所以企业认证/商户号这条线整条不走 |
+| 建议补 3 个效果案例 | ⬜ 未准备(发布后可补) |
+| 安全审核(AI 行为分析 + 静态规则 + 沙箱,查恶意代码与**密钥泄露**) | ✅ 包里无密钥:public client 无 secret,token 由用户当场授权换取 |
+
+**不做 Pay Skill。** 教程里的「升级为 Pay Skill」(`#agent-pay-upgrade`)是微信 Agent Pay
+X402 那条线:企业认证 → 绑微信商户号 → SkillHub 开发者密钥(RSA2048)→ 微信支付下单 →
+X402 预下单签名换 `payment_code` → 响应回 `402` + `WeixinPay-Required`。
+我们**整条不走**,因为对外只读调用不计费(设计文档 §3.7:那本账算的是引擎侧采样的真实外部支出,
+只读查库没有对应支出,合账就说不清了;闸门是限速不是计费)。
+要收费是**推翻那条决策**,得先改设计文档,不是在这里加个签名步骤。
+
+### clawhub.ai(**未实测**)
+
+`npm i -g clawhub` → `clawhub login` → `clawhub skill publish ./vtag-geo-analytics
+--slug <slug> --version <ver>`;也支持从 GitHub 导入。以上读自官网,不是跑过。
 
 **同一个包发两处,不各做一份**。某个市场要求改元数据格式,改的是发布脚本,不是包内容。
-跑通之后回来把这张表改写成实测结果 —— 写实测,不写设计意图。
+跑通之后回来把这两节改写成实测结果——写实测,不写设计意图。
 
 ## 改这个包时最容易做错的四件事
 
