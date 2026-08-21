@@ -20,7 +20,8 @@ vtag-geo-analytics/          ← 发布出去的就是这个目录,单独一层�
     metrics.md               六指标公式 + 口径红线全文 + 来源分档的原值含义
 tools/gen_endpoints.py       生成器:读后端 reports.py,写 references/endpoints.md
                              与 SKILL.md 里那张摘要表(留在包外,包是公开可读的)
-tools/pack.sh                打 dist/*.zip:SKILL.md 落在 zip 根目录,打完自校验
+tools/pack.sh                打 zip:**产物落在仓库外**,SKILL.md 在 zip 根目录,打完自校验
+docs/                        发布清单与 CHANGELOG(决策在主仓库 docs/15、docs/16)
 ```
 
 ## 端点表由生成器产出,不许手抄
@@ -66,11 +67,13 @@ python3 tools/gen_endpoints.py --check    # 只校验同步,不写;适合发版�
 ## 打包上传:SKILL.md 必须在根目录
 
 ```bash
-tools/pack.sh        # → dist/vtag-geo-analytics-<version>.zip,打完自校验
+tools/pack.sh                    # → $TMPDIR/vtag-skill-dist/vtag-geo-analytics-<version>.zip
+VTAG_DIST=~/somewhere tools/pack.sh
 ```
 
-⚠️ **zip 是构建产物,不进仓库**(`dist/` 与 `*.zip` 都在 `.gitignore` 里)。要发版就现打一个:
-仓库里躺着的 zip 只会变成"和源码对不上的那一份",而上传的人分不出手里这个是不是最新的。
+⚠️ **zip 打在仓库外面**,`VTAG_DIST` 指到仓库里会直接报错退出。不是"打进 `dist/` 再
+`.gitignore` 掉"——那样仓库目录里始终躺着一个 zip,传的人分不出手里这个是不是最新的,
+git 忽略它也拦不住有人把它拖进上传框。要发版就现打一个。
 
 skillhub.cn 的发布检查清单写的是「ZIP 包或 Skill 文件夹内必须包含 `SKILL.md`」,
 步骤里更严格:「确认**根目录**包含 SKILL.md」。**在仓库根 `zip -r` 会打出
@@ -83,9 +86,9 @@ skillhub.cn 的发布检查清单写的是「ZIP 包或 Skill 文件夹内必须
 
 ### skillhub.cn(读了官方教程 + 走到上传页,**未跑完审核**)
 
-**逐字段填什么、上传那一刻才暴露的两个坑、当前阻塞项 —— 全在主仓库的
-`Geo-Analytics/docs/16-skill对外发布.md`。**(操作面单一来源:这边只放包本身,
-发布怎么走跟着项目文档编号走,不在两个仓库各留一份。)
+动作清单在 [`docs/发布清单.md`](docs/发布清单.md)(打包、两个坑、字段速查、自检);
+**决策**(平台要求全表、为什么不做 Pay Skill、当前阻塞项)在主仓库
+`Geo-Analytics/docs/16-skill对外发布.md`。值的唯一来源始终是 `SKILL.md` 的 frontmatter。
 
 来源:`https://skillhub.cn/tutorials`(页面是 SPA,内容在 JS bundle 里,网页抓取抓不到)。
 

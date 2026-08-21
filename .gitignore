@@ -1,4 +1,5 @@
 __pycache__/
 *.pyc
+# 兜底:产物本就打在仓库外(tools/pack.sh),这两行只防手滑
 dist/
 *.zip
