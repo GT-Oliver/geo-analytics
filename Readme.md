@@ -83,7 +83,9 @@ skillhub.cn 的发布检查清单写的是「ZIP 包或 Skill 文件夹内必须
 
 ### skillhub.cn(读了官方教程 + 走到上传页,**未跑完审核**)
 
-**逐字段填什么见 [`docs/skillhub-首次发布.md`](docs/skillhub-首次发布.md)。**
+**逐字段填什么、上传那一刻才暴露的两个坑、当前阻塞项 —— 全在主仓库的
+`Geo-Analytics/docs/16-skill对外发布.md`。**(操作面单一来源:这边只放包本身,
+发布怎么走跟着项目文档编号走,不在两个仓库各留一份。)
 
 来源:`https://skillhub.cn/tutorials`(页面是 SPA,内容在 JS bundle 里,网页抓取抓不到)。
 
