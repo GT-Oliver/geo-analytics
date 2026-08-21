@@ -69,6 +69,9 @@ python3 tools/gen_endpoints.py --check    # 只校验同步,不写;适合发版�
 tools/pack.sh        # → dist/vtag-geo-analytics-<version>.zip,打完自校验
 ```
 
+⚠️ **zip 是构建产物,不进仓库**(`dist/` 与 `*.zip` 都在 `.gitignore` 里)。要发版就现打一个:
+仓库里躺着的 zip 只会变成"和源码对不上的那一份",而上传的人分不出手里这个是不是最新的。
+
 skillhub.cn 的发布检查清单写的是「ZIP 包或 Skill 文件夹内必须包含 `SKILL.md`」,
 步骤里更严格:「确认**根目录**包含 SKILL.md」。**在仓库根 `zip -r` 会打出
 `vtag-geo-analytics/SKILL.md`——根目录没有它,当场判缺文件。**
