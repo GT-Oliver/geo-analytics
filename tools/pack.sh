@@ -22,6 +22,23 @@ OUT_DIR="${VTAG_DIST:-${TMPDIR:-/tmp}/vtag-skill-dist}"
 case "$OUT_DIR" in
   "$PWD"|"$PWD"/*) echo "VTAG_DIST 指到了仓库里($OUT_DIR)—— 产物不进仓库" >&2; exit 1 ;;
 esac
+# 描述在两处出现:SKILL.md 的 frontmatter(平台自动抓的那份)与 docs/发布清单.md 里
+# 供手填复制的那段。**抄件漂了没人会发现** —— 除非每次打包都比一遍,所以在这里比。
+python3 - "$PKG/SKILL.md" docs/发布清单.md <<'PY' || exit 1
+import re, sys
+skill, doc = (open(p, encoding="utf-8").read() for p in sys.argv[1:3])
+a = [l for l in skill.splitlines() if l.startswith("description:")]
+if not a:
+    sys.exit("SKILL.md 里没有 description")
+a = a[0].split(":", 1)[1].strip().strip('"')
+m = re.search(r"<!-- BEGIN description.*?-->\s*```\s*(.*?)\s*```\s*<!-- END description -->",
+              doc, re.S)
+if not m:
+    sys.exit("docs/发布清单.md 里找不到 description 标记块")
+if m.group(1).strip() != a:
+    sys.exit("SKILL.md 与 docs/发布清单.md 的描述不一致 —— 改 SKILL.md 那份,再同步文档")
+PY
+
 mkdir -p "$OUT_DIR"
 out="$OUT_DIR/${PKG}-${ver}.zip"
 rm -f "$out"
