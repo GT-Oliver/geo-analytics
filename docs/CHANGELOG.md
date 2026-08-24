@@ -3,6 +3,27 @@
 版本号与 `vtag-geo-analytics/SKILL.md` 的 `version` 保持一致 —— **两处不一致,审核和用户
 都得问哪个是真的**。发布表单里「描述本次版本的主要变更内容」那一栏,直接粘对应小节的正文。
 
+## 1.0.2 —— 2026-08-24
+
+**只改发布页的显示名,包内容与 1.0.1 逐字节相同**(除 frontmatter 的 `version`)。
+
+发 1.0.1 时显示名被写成了字面的 `Publish` —— `clawhub skill publish <path>` 在没有
+`--name` 时**从文件夹名推导显示名**,而当时传的是一个叫 `publish` 的暂存目录。
+干跑复现两次确认与 `--no-input` 无关,就是 basename。
+
+📌 **教训**:这个 CLI 的显示名不来自 `SKILL.md` 的 `name:`,也不来自正文标题,
+而是来自你传给它的那个路径。以后发布**一律显式带 `--name`**,并且暂存目录就叫
+包名,别叫 `publish` / `dist` / `tmp` 这类词。
+
+显示名定为 `Geo analytics & AI visibility`(首次上架时那个,与 slug `geo-analytics`
+对得上)—— 包内 `name: vtag-geo-analytics` 与正文标题 `# Vtag GEO Analytics` 未动。
+
+发布表单粘这一段:
+
+```
+修复发布页显示名(1.0.1 误显示为 "Publish")。包内容与 1.0.1 相同,已安装的用户无需更新。
+```
+
 ## 1.0.1 —— 2026-08-24
 
 ⚠️ **为什么不是 1.0.0**:clawhub 上 `1.0.0` 这个号 08-21 就被占了(平台侧的默认号,
