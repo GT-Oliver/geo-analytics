@@ -42,7 +42,14 @@ PY
 mkdir -p "$OUT_DIR"
 out="$OUT_DIR/${PKG}-${ver}.zip"
 rm -f "$out"
-( cd "$PKG" && zip -qr "$out" . -x '.*' -x '*/.*' )
+# LICENSE 只在仓库根留一份,打包时**复制**进 zip 根目录 —— 包内不留第二份源文件。
+# SKILL.md frontmatter 写的是「见仓库 LICENSE」,装出去的人手里得真有这个文件:
+# 平台页面显示的许可证与包里的一致,是发布检查的一项(16 §六 第 4 条)。
+[ -f LICENSE ] || { echo "仓库根没有 LICENSE —— SKILL.md 里写了「见仓库 LICENSE」" >&2; exit 1; }
+tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
+cp -a "$PKG/." "$tmp/"
+cp LICENSE "$tmp/LICENSE"
+( cd "$tmp" && zip -qr "$out" . -x '.*' -x '*/.*' )
 
 # 打完就验,不靠"我记得打对了":根目录有没有 SKILL.md、文件数与体积在不在平台限内
 # (单次上传 ≤ 10.00 MB,建议 ≤ 200 个文件)。
